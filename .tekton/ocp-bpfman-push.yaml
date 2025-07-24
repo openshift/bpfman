@@ -30,6 +30,10 @@ spec:
     value: Containerfile.bpfman.openshift
   - name: path-context
     value: .
+  - name: hermetic
+    value: "true"
+  - name: prefetch-input
+    value: '{"type": "cargo", "path": "."}'
   - name: build-platforms
     value:
     - localhost
