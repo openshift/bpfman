@@ -1,0 +1,43 @@
+[advisories]
+
+[licenses]
+version = 2
+confidence-threshold = 1.0
+
+# List of explictly allowed licenses
+# See https://spdx.org/licenses/ for list of possible licenses
+# [possible values: any SPDX 3.11 short identifier (+ optional exception)].
+allow = [
+    "Unicode-DFS-2016",
+    "Apache-2.0",
+    "BSD-3-Clause",
+    "ISC",
+    "MIT",
+    "MPL-2.0",
+]
+
+exceptions = [
+    # Ring has a...complicated license. However, since it is at the core of a large number of rust
+    # projects, we are manually allowing the OpenSSL part of the license
+    { name = "ring", allow = [
+        "OpenSSL",
+    ] },
+    # same exception as above for another crate
+    { name = "aws-lc-sys", allow = [
+        "OpenSSL",
+    ] },
+]
+
+[[licenses.clarify]]
+name = "encoding_rs"
+version = "*"
+expression = "(Apache-2.0 OR MIT) AND BSD-3-Clause"
+license-files = [{ path = "COPYRIGHT", hash = 0x39f8ad31 }]
+
+[[licenses.clarify]]
+name = "ring"
+expression = "MIT AND ISC AND OpenSSL"
+license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
+[bans]
+multiple-versions = "allow"

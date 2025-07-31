@@ -1,2 +1,13 @@
 [alias]
 xtask = "run --package xtask --"
+
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/dave-tucker/sigstore-rs?branch=tough-down"]
+git = "https://github.com/dave-tucker/sigstore-rs"
+branch = "tough-down"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "rust-vendor"

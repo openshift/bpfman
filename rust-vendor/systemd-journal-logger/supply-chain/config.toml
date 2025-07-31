@@ -1,0 +1,91 @@
+
+# cargo-vet config file
+
+[cargo-vet]
+version = "0.10"
+
+[imports.bytecode-alliance]
+url = "https://raw.githubusercontent.com/bytecodealliance/wasmtime/main/supply-chain/audits.toml"
+
+[imports.embark-studios]
+url = "https://raw.githubusercontent.com/EmbarkStudios/rust-ecosystem/main/audits.toml"
+
+[imports.google]
+url = "https://raw.githubusercontent.com/google/supply-chain/main/audits.toml"
+
+[imports.mozilla]
+url = "https://raw.githubusercontent.com/mozilla/supply-chain/main/audits.toml"
+
+[imports.swsnr]
+url = "https://codeberg.org/swsnr/rust-supply-chain/raw/branch/main/audits.toml"
+
+[policy.systemd-journal-logger]
+audit-as-crates-io = false
+
+[[exemptions.console]]
+version = "0.15.10"
+criteria = "safe-to-run"
+
+[[exemptions.once_cell]]
+version = "1.20.2"
+criteria = "safe-to-run"
+
+[[exemptions.serde_fmt]]
+version = "1.0.3"
+criteria = "safe-to-deploy"
+
+[[exemptions.similar]]
+version = "2.7.0"
+criteria = "safe-to-run"
+
+[[exemptions.similar-asserts]]
+version = "1.6.1"
+criteria = "safe-to-run"
+
+[[exemptions.sval]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_buffer]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_dynamic]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_fmt]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_json]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_nested]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_ref]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.sval_serde]]
+version = "2.14.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.value-bag]]
+version = "1.10.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.value-bag-serde1]]
+version = "1.10.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.value-bag-sval2]]
+version = "1.10.0"
+criteria = "safe-to-deploy"
+
+[[exemptions.zerocopy]]
+version = "0.7.35"
+criteria = "safe-to-run"

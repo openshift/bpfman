@@ -1,0 +1,6 @@
+---
+source: src/sources/cfg.rs
+expression: diags
+snapshot_kind: text
+---
+

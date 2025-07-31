@@ -1,0 +1,14 @@
+[graph]
+targets = ['x86_64-unknown-linux-gnu']
+
+[advisories]
+version = 2
+ignore = []
+
+[licenses]
+version = 2
+allow = ["MIT", "Apache-2.0"]
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

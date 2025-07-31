@@ -1,0 +1,5 @@
+---
+source: src/advisories/cfg.rs
+expression: diags
+---
+

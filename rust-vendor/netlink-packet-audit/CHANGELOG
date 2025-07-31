@@ -1,0 +1,22 @@
+# Changelog
+## [0.5.1] - 2023-07-10
+### Breaking changes
+ - N/A
+
+### New features
+ - N/A
+
+### Bug fixes
+ - Use latest rust-netlink crates. (d183103)
+
+## [0.5.0] - 2023-01-28
+### Breaking changes
+ - All public struct and enum are marked as `non_exhaustive`. Please check
+   https://doc.rust-lang.org/reference/attributes/type_system.html for more
+   detail. (5660d73)
+
+### New features
+ - N/A
+
+### Bug fixes
+ - N/A
