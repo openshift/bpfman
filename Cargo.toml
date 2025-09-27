@@ -87,7 +87,7 @@ quote = { version = "1", default-features = false }
 rand = { version = "0.9", default-features = false }
 regex = { version = "1.11.1", default-features = false }
 rtnetlink = { version = "0.14", default-features = false }
-rustdoc-json = { version = "0.8.9", default-features = false }
+rustdoc-json = { version = "0.9.0", default-features = false }
 rustup-toolchain = { version = "0.1.10", default-features = false }
 serde = { version = "1.0", default-features = false }
 serde_json = { version = "1", default-features = false }
