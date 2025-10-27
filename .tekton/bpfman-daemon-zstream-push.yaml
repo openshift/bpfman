@@ -9,7 +9,10 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "release-4.20"
+      == "release-4.20" && (".tekton/multi-arch-build-pipeline.yaml".pathChanged() || ".tekton/bpfman-daemon-zstream-pull-request.yaml".pathChanged()
+      || ".tekton/bpfman-daemon-zstream-push.yaml".pathChanged() || "Containerfile.bpfman.openshift".pathChanged()
+      || "Cargo.toml".pathChanged() || "Cargo.lock".pathChanged() || "src/***".pathChanged()
+      || "hack/konflux/images/bpfman.txt".pathChanged() || "OPENSHIFT-VERSION".pathChanged())
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: bpfman-zstream
