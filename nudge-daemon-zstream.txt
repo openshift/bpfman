@@ -1,0 +1,6 @@
+Nudge daemon zstream build for release-0.5.8
+
+Trigger a fresh daemon build on the release-0.5.8 branch to ensure
+the latest zstream daemon image is built and available for the
+bundle to reference.
+
