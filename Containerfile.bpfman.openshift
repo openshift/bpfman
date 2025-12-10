@@ -8,7 +8,6 @@ COPY ./ /usr/src/bpfman
 
 # Install build dependencies including Rust toolchain
 RUN dnf update -y \
-    && dnf install -y gcc openssl-devel cmake clang-devel rust cargo \
     && dnf clean all
 
 # Compile bpfman cli, bpfman-ns, and bpfman-rpc binaries
