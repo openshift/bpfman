@@ -32,7 +32,7 @@ spec:
   - name: hermetic
     value: 'true'
   - name: prefetch-input
-    value: '{"packages": [{"type": "rpm", "path": "."}, {"type": "cargo", "path": "."}]}'
+    value: '[{"type": "rpm", "path": "./rpm-prefetching/bpfman-daemon"}, {"type": "cargo", "path": "."}]'
   - name: build-platforms
     value:
     - linux/x86_64
