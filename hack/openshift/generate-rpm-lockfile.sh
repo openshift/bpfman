@@ -9,7 +9,7 @@ set -euo pipefail
 container_name="localhost/rpm-lockfile-prototype"
 rpms_in_file="rpms.in.yaml"
 rpms_lock_file="rpms.lock.yaml"
-default_base_image="registry.access.redhat.com/ubi9/ubi:latest"
+default_base_image="registry.access.redhat.com/ubi9/ubi-minimal:latest"
 
 print_status() {
     echo "[INFO] $1"
