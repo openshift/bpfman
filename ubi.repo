@@ -1,0 +1,20 @@
+[ubi-9-for-x86_64-baseos-rpms]
+name = Red Hat Universal Base Image 9 (RPMs) - BaseOS
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/baseos/os
+enabled = 1
+gpgcheck = 0
+skip_if_unavailable = False
+
+[ubi-9-for-x86_64-appstream-rpms]
+name = Red Hat Universal Base Image 9 (RPMs) - AppStream
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/appstream/os
+enabled = 1
+gpgcheck = 0
+skip_if_unavailable = False
+
+[ubi-9-for-x86_64-codeready-builder-rpms]
+name = Red Hat Universal Base Image 9 (RPMs) - CodeReady Builder
+baseurl = https://cdn-ubi.redhat.com/content/public/ubi/dist/ubi9/9/x86_64/codeready-builder/os
+enabled = 1
+gpgcheck = 0
+skip_if_unavailable = False
