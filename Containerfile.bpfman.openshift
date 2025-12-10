@@ -2,15 +2,14 @@ ARG BUILDVERSION
 
 FROM registry.access.redhat.com/ubi9/ubi:latest AS bpfman-build
 ARG BUILDVERSION
-ARG DNF_CMD="dnf"
 
 WORKDIR /usr/src/bpfman
 COPY ./ /usr/src/bpfman
 
 # Install build dependencies including Rust toolchain
-RUN ${DNF_CMD} update -y \
-    && ${DNF_CMD} install -y gcc openssl-devel cmake clang-devel rust cargo \
-    && ${DNF_CMD} clean all
+RUN dnf update -y \
+    && dnf install -y gcc openssl-devel cmake clang-devel rust cargo \
+    && dnf clean all
 
 # Compile bpfman cli, bpfman-ns, and bpfman-rpc binaries
 RUN mkdir -p bin/
