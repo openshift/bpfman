@@ -86,6 +86,7 @@ EOF
 
 build_container() {
     local rebuild_flag=${1:-false}
+    local temp_dir=$2
 
     if podman image exists "$container_name" && [[ "$rebuild_flag" != "true" ]]; then
         print_status "Container $container_name already exists, skipping build"
@@ -94,10 +95,6 @@ build_container() {
     fi
 
     print_status "Building rpm-lockfile-prototype container..."
-
-    local temp_dir
-    temp_dir=$(mktemp -d)
-    trap 'rm -rf "$temp_dir"' RETURN
 
     print_status "Cloning rpm-lockfile-prototype repository..."
     if ! git clone -q https://github.com/konflux-ci/rpm-lockfile-prototype.git "$temp_dir/rpm-lockfile-prototype"; then
@@ -219,8 +216,15 @@ main() {
     print_status "Starting RPM lockfile generation..."
     print_status "Working directory: $(pwd)"
 
+    # Create temporary directory for container build operations
+    local temp_dir
+    temp_dir=$(mktemp -d)
+
+    # Set up cleanup trap
+    trap "rm -rf \"$temp_dir\"" EXIT
+
     check_requirements
-    build_container "$rebuild_container"
+    build_container "$rebuild_container" "$temp_dir"
     generate_lockfile "$base_image" "$input_file" "$output_file"
     validate_lockfile "$output_file"
 
