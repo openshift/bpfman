@@ -10,6 +10,7 @@ contentOrigin:
     - ./ubi.repo
 arches:
   - x86_64
+  - s390x
 context:
   containerfile:
     file: Containerfile.bpfman.openshift
