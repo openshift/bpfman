@@ -7,8 +7,8 @@ WORKDIR /usr/src/bpfman
 COPY ./ /usr/src/bpfman
 
 # Install build dependencies including Rust toolchain
-RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc openssl-devel cmake clang-devel rust cargo && microdnf clean all
+RUN dnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
+    gcc openssl-devel cmake clang-devel rust cargo && dnf clean all
 
 # Compile bpfman cli, bpfman-ns, and bpfman-rpc binaries
 RUN mkdir -p bin/
