@@ -1,8 +1,8 @@
 ARG BUILDVERSION
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1764794109 AS bpfman-build
+FROM registry.access.redhat.com/ubi9/ubi:9.7-1764794109 AS bpfman-build
 ARG BUILDVERSION
-ARG DNF_CMD="microdnf"
+ARG DNF_CMD="dnf"
 
 WORKDIR /usr/src/bpfman
 COPY ./ /usr/src/bpfman
