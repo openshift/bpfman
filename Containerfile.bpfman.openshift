@@ -14,15 +14,15 @@ RUN ${DNF_CMD} update -y \
 
 # Compile bpfman cli, bpfman-ns, and bpfman-rpc binaries
 RUN mkdir -p bin/
-RUN cargo build --release
+RUN cargo build
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7-1764794109
 
 ARG BUILDVERSION
 
-COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman .
-COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman-ns .
-COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman-rpc .
+COPY --from=bpfman-build  /usr/src/bpfman/target/debug/bpfman .
+COPY --from=bpfman-build  /usr/src/bpfman/target/debug/bpfman-ns .
+COPY --from=bpfman-build  /usr/src/bpfman/target/debug/bpfman-rpc .
 
 LABEL name="bpfman/bpfman" \
       com.redhat.component="bpfman" \
