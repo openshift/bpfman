@@ -13,5 +13,5 @@ arches:
   - s390x
 context:
   containerfile:
-    file: Containerfile.bpfman.openshift
+    file: ./Containerfile.bpfman.openshift
     stageName: bpfman-build
