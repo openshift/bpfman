@@ -30,7 +30,7 @@ spec:
   - name: build-args-file
     value: OPENSHIFT-VERSION
   - name: hermetic
-    value: 'true'
+    value: 'false'
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
