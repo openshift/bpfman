@@ -97,7 +97,7 @@ build_container() {
 
     local temp_dir
     temp_dir=$(mktemp -d)
-    trap 'rm -rf "$temp_dir"' EXIT
+    trap 'rm -rf "$temp_dir"' RETURN
 
     print_status "Cloning rpm-lockfile-prototype repository..."
     if ! git clone -q https://github.com/konflux-ci/rpm-lockfile-prototype.git "$temp_dir/rpm-lockfile-prototype"; then
