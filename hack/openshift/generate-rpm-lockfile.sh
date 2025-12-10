@@ -9,7 +9,7 @@ set -euo pipefail
 container_name="localhost/rpm-lockfile-prototype"
 rpms_in_file="rpms.in.yaml"
 rpms_lock_file="rpms.lock.yaml"
-default_base_image="registry.access.redhat.com/ubi9/python-312"
+default_base_image="registry.access.redhat.com/ubi9/ubi:latest"
 
 print_status() {
     echo "[INFO] $1"
@@ -42,7 +42,7 @@ OPTIONS:
 
 EXAMPLES:
     ${0##*/}                                          # Use default files and base image
-    ${0##*/} -b registry.access.redhat.com/ubi9/ubi  # Use different base image
+    ${0##*/} -b registry.access.redhat.com/ubi9/python-312  # Use different base image
     ${0##*/} --rebuild-container                      # Force container rebuild
     ${0##*/} -i my-rpms.in.yaml -o my-rpms.lock.yaml # Use custom input/output files
 
