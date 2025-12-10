@@ -33,10 +33,6 @@ spec:
     value: 'true'
   - name: prefetch-input
     value: '{"packages": [{"type": "rpm", "path": "."}, {"type": "cargo", "path": "."}]}'
-  - name: build-platforms
-    value:
-    - linux/x86_64
-    - linux/s390x
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
