@@ -177,62 +177,58 @@ validate_lockfile() {
     print_success "Lockfile validation passed"
 }
 
-main() {
-    local base_image="$default_base_image"
-    local input_file="$rpms_in_file"
-    local output_file="$rpms_lock_file"
-    local rebuild_container=false
+# Parse command line arguments
+base_image="$default_base_image"
+input_file="$rpms_in_file"
+output_file="$rpms_lock_file"
+rebuild_container=false
 
-    while [[ $# -gt 0 ]]; do
-        case $1 in
-            -i|--input)
-                input_file="$2"
-                shift 2
-                ;;
-            -o|--output)
-                output_file="$2"
-                shift 2
-                ;;
-            -b|--base-image)
-                base_image="$2"
-                shift 2
-                ;;
-            --rebuild-container)
-                rebuild_container=true
-                shift
-                ;;
-            -h|--help)
-                usage
-                exit 0
-                ;;
-            *)
-                print_error "Unknown option: $1"
-                usage
-                exit 1
-                ;;
-        esac
-    done
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -i|--input)
+            input_file="$2"
+            shift 2
+            ;;
+        -o|--output)
+            output_file="$2"
+            shift 2
+            ;;
+        -b|--base-image)
+            base_image="$2"
+            shift 2
+            ;;
+        --rebuild-container)
+            rebuild_container=true
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            print_error "Unknown option: $1"
+            usage
+            exit 1
+            ;;
+    esac
+done
 
-    print_status "Starting RPM lockfile generation..."
-    print_status "Working directory: $(pwd)"
+print_status "Starting RPM lockfile generation..."
+print_status "Working directory: $(pwd)"
 
-    # Create temporary directory for container build operations
-    local temp_dir
-    temp_dir=$(mktemp -d)
+# Create temporary directory for container build operations
+temp_dir=$(mktemp -d)
 
-    # Set up cleanup trap
-    trap "rm -rf \"$temp_dir\"" EXIT
+# Set up cleanup trap
+trap 'rm -rf "$temp_dir"' EXIT
 
-    check_requirements
-    build_container "$rebuild_container" "$temp_dir"
-    generate_lockfile "$base_image" "$input_file" "$output_file"
-    validate_lockfile "$output_file"
+check_requirements
+build_container "$rebuild_container" "$temp_dir"
+generate_lockfile "$base_image" "$input_file" "$output_file"
+validate_lockfile "$output_file"
 
-    print_success "RPM lockfile generation completed!"
-    print_status "Next steps:"
-    print_status "  1. Review the generated $output_file"
-    print_status "  2. Commit both $input_file and $output_file to your repository"
-    print_status "  3. Ensure your Tekton pipelines have the correct prefetch-input configuration"
-}
-
-main "$@"
+print_success "RPM lockfile generation completed!"
+print_status "Next steps:"
+print_status "  1. Review the generated $output_file"
+print_status "  2. Commit both $input_file and $output_file to your repository"
+print_status "  3. Ensure your Tekton pipelines have the correct prefetch-input configuration"
