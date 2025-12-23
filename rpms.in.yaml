@@ -5,9 +5,10 @@ packages:
   - clang-devel
   - rust
   - cargo
+  - libbpf-devel
 contentOrigin:
   repofiles:
-    - ./ubi.repo
+    - ./redhat.repo
 arches:
   - x86_64
   - s390x
