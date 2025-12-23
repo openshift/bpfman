@@ -42,6 +42,7 @@ OPTIONS:
     -o, --output FILE         Output rpms.lock.yaml file (default: ${rpms_lock_file})
     -r, --repo-file FILE      Output redhat.repo file (default: ${redhat_repo_file})
     -b, --base-image IMAGE    Base container image (default: ${default_base_image})
+    --list-repos              List repos enabled by the activation key and exit
     -h, --help                Show this help message
 
 ENVIRONMENT VARIABLES:
@@ -92,6 +93,20 @@ check_requirements() {
     print_success "Requirements check passed"
 }
 
+list_repos() {
+    print_status "Listing repos enabled by activation key..."
+
+    podman run --rm \
+         -e "RH_ORG_ID=${org_id}" \
+         -e "RH_ACTIVATION_KEY=${activation_key}" \
+         registry.access.redhat.com/ubi9 \
+         bash -c '
+subscription-manager register --org="$RH_ORG_ID" --activationkey="$RH_ACTIVATION_KEY" >/dev/null
+echo "Enabled repositories:"
+subscription-manager repos --list-enabled | grep "Repo ID:" | sed "s/Repo ID:/  -/"
+'
+}
+
 generate_lockfile() {
     local base_image="$1"
     local input_file="$2"
@@ -130,17 +145,14 @@ set -euo pipefail
 # Register with activation key (values from environment)
 subscription-manager register --org="$RH_ORG_ID" --activationkey="$RH_ACTIVATION_KEY"
 
-# Disable problematic repos (EUS, debug, RHUI)
-subscription-manager repos --disable="*-eus-*" --disable="*-debug-*" --disable="*-rhui-*" 2>/dev/null || true
-
 # Install dependencies
-dnf install -y pip skopeo
+dnf install -y pip skopeo perl-interpreter
 
 # Install rpm-lockfile-prototype
 pip install --user "https://github.com/konflux-ci/rpm-lockfile-prototype/archive/refs/tags/${RPM_LOCKFILE_VERSION}.tar.gz"
 
-# Copy and fix repo file
-cp /etc/yum.repos.d/redhat.repo "/work/${REPO_FILE}"
+# Copy repo file, filter to only enabled repos, and fix arch placeholder
+perl -00 -ne '"'"'print if /^enabled\s*=\s*1$/m'"'"' /etc/yum.repos.d/redhat.repo > "/work/${REPO_FILE}"
 sed -i "s/$(uname -m)/\$basearch/g" "/work/${REPO_FILE}"
 
 # Generate lockfile
@@ -206,6 +218,7 @@ output_file="$rpms_lock_file"
 repo_file="$redhat_repo_file"
 activation_key="${RH_ACTIVATION_KEY:-}"
 org_id="${RH_ORG_ID:-}"
+list_repos_only=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -233,6 +246,10 @@ while [[ $# -gt 0 ]]; do
             base_image="$2"
             shift 2
             ;;
+        --list-repos)
+            list_repos_only=true
+            shift
+            ;;
         -h|--help)
             usage
             exit 0
@@ -244,6 +261,24 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [[ "$list_repos_only" == "true" ]]; then
+    # Minimal requirements check for --list-repos
+    if ! command -v podman &> /dev/null; then
+        print_error "podman is required but not installed"
+        exit 1
+    fi
+    if [[ -z "${activation_key:-}" ]]; then
+        print_error "Activation key is required. Use -k/--activation-key or set RH_ACTIVATION_KEY"
+        exit 1
+    fi
+    if [[ -z "${org_id:-}" ]]; then
+        print_error "Organisation ID is required. Use -O/--org or set RH_ORG_ID"
+        exit 1
+    fi
+    list_repos
+    exit 0
+fi
 
 print_status "Starting RPM lockfile generation with RHEL subscription..."
 print_status "Working directory: $(pwd)"
