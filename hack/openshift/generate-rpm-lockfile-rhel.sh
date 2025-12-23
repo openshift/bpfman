@@ -152,7 +152,7 @@ dnf install -y pip skopeo perl-interpreter
 pip install --user "https://github.com/konflux-ci/rpm-lockfile-prototype/archive/refs/tags/${RPM_LOCKFILE_VERSION}.tar.gz"
 
 # Copy repo file, filter to only enabled repos, and fix arch placeholder
-perl -00 -ne '"'"'print if /^enabled\s*=\s*1$/m'"'"' /etc/yum.repos.d/redhat.repo > "/work/${REPO_FILE}"
+perl -00 -ne "print if /^enabled\\s*=\\s*1\$/m" /etc/yum.repos.d/redhat.repo > "/work/${REPO_FILE}"
 sed -i "s/$(uname -m)/\$basearch/g" "/work/${REPO_FILE}"
 
 # Generate lockfile
