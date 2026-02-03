@@ -33,7 +33,7 @@ usage() {
 Usage: ${0##*/} [OPTIONS]
 
 Extract RHEL entitlement certificates by registering a UBI container.
-The entitlements can then be used with generate-rpm-lockfile-rhel.sh or
+The entitlements can then be used with generate-rpm-lockfile.sh or
 mounted directly into containers that need subscription content access.
 
 OPTIONS:
@@ -56,31 +56,9 @@ EXAMPLES:
     ${0##*/} -o /tmp/entitlements
 
 USAGE WITH LOCKFILE GENERATION:
-    After extracting entitlements, you can regenerate the RPM lockfile:
+    After extracting entitlements, regenerate the RPM lockfile:
 
-    1. Update redhat.repo with your cert ID:
-       CERT_ID=\$(ls ~/.rhel-entitlements/*.pem | grep -v key | sed 's/.*\\/\\([0-9]*\\)\\.pem/\\1/')
-       OLD_ID=\$(grep -oP 'entitlement/\\K[0-9]+' redhat.repo | head -1)
-       sed -i "s/\$OLD_ID/\$CERT_ID/g" redhat.repo
-
-    2. Run the lockfile generator:
-       podman run --rm \\
-           -v "\$(pwd):/work:Z" \\
-           -v "\$HOME/.rhel-entitlements:/etc/pki/entitlement:Z" \\
-           -w /work \\
-           -e "RPM_LOCKFILE_VERSION=v0.13.1" \\
-           registry.access.redhat.com/ubi9 bash -c '
-       dnf install -y pip skopeo perl-interpreter
-       pip install --quiet --user \\
-           "https://github.com/konflux-ci/rpm-lockfile-prototype/archive/refs/tags/\${RPM_LOCKFILE_VERSION}.tar.gz"
-       ~/.local/bin/rpm-lockfile-prototype \\
-           --image registry.access.redhat.com/ubi9/ubi-minimal:latest \\
-           --outfile rpms.lock.yaml \\
-           rpms.in.yaml
-       '
-
-    3. Revert redhat.repo before committing:
-       git checkout redhat.repo
+    ./hack/openshift/generate-rpm-lockfile.sh -e ~/.rhel-entitlements
 
 EOF
 }
@@ -125,6 +103,13 @@ extract_entitlements() {
     print_status "Creating output directory: $output_dir"
     mkdir -p "$output_dir"
 
+    # Clean up old entitlement files
+    if ls "${output_dir}"/*.pem &>/dev/null; then
+        print_status "Removing old entitlement files..."
+        rm -f "${output_dir}"/*.pem
+        rm -rf "${output_dir}/rhsm-ca"
+    fi
+
     print_status "Registering container and extracting entitlements..."
     print_status "Username: $rh_user"
 
@@ -137,7 +122,9 @@ set -e
 subscription-manager register --username="$RH_USER" --password="$RH_PASS" >/dev/null
 echo "Registered successfully"
 cp /etc/pki/entitlement/*.pem /output/
-echo "Entitlements copied"
+mkdir -p /output/rhsm-ca
+cp /etc/rhsm/ca/*.pem /output/rhsm-ca/
+echo "Entitlements and CA certificates copied"
 subscription-manager unregister >/dev/null 2>&1 || true
 '; then
         print_error "Failed to extract entitlements"
@@ -149,7 +136,7 @@ subscription-manager unregister >/dev/null 2>&1 || true
         ls -la "$output_dir"/*.pem
 
         local cert_id
-        cert_id=$(ls "${output_dir}"/*.pem | grep -v key | head -1 | sed 's/.*\/\([0-9]*\)\.pem/\1/')
+        cert_id=$(find "${output_dir}" -maxdepth 1 -name '*.pem' ! -name '*-key.pem' -print -quit | sed 's/.*\/\([0-9]*\)\.pem/\1/')
         echo ""
         print_status "Certificate ID: $cert_id"
         print_status "To use with podman:"
