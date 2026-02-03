@@ -9,6 +9,7 @@ set -euo pipefail
 container_name="localhost/rpm-lockfile-prototype"
 rpms_in_file="rpms.in.yaml"
 rpms_lock_file="rpms.lock.yaml"
+redhat_repo_file="redhat.repo"
 default_base_image="registry.access.redhat.com/ubi9/ubi-minimal:latest"
 
 print_status() {
@@ -37,6 +38,9 @@ OPTIONS:
     -i, --input FILE        Input rpms.in.yaml file (default: ${rpms_in_file})
     -o, --output FILE       Output rpms.lock.yaml file (default: ${rpms_lock_file})
     -b, --base-image IMAGE  Base container image (default: ${default_base_image})
+    -e, --entitlements-dir DIR  Directory containing RHEL entitlement certificates
+                            Use this for accessing RHEL subscription content locally.
+                            Generate entitlements with: ./hack/openshift/get-rhel-entitlements.sh
     --rebuild-container     Force rebuild of rpm-lockfile-prototype container
     -h, --help              Show this help message
 
@@ -45,11 +49,23 @@ EXAMPLES:
     ${0##*/} -b registry.access.redhat.com/ubi9/python-312  # Use different base image
     ${0##*/} --rebuild-container                      # Force container rebuild
     ${0##*/} -i my-rpms.in.yaml -o my-rpms.lock.yaml # Use custom input/output files
+    ${0##*/} -e ~/.rhel-entitlements                  # Use local RHEL entitlements
 
 REQUIREMENTS:
     - podman must be installed and available
     - ${rpms_in_file} must exist in current directory
     - Internet connection for downloading container images
+
+USING ENTITLEMENTS:
+    When accessing RHEL subscription content (e.g., CodeReady Builder repos),
+    you need entitlement certificates. The Konflux activation key only works
+    within Konflux infrastructure. For local generation:
+
+    1. Extract entitlements: ./hack/openshift/get-rhel-entitlements.sh
+    2. Run with entitlements: ${0##*/} -e ~/.rhel-entitlements
+
+    The script will automatically update redhat.repo with the correct
+    certificate ID and restore it after generation.
 
 EOF
 }
@@ -111,15 +127,68 @@ build_container() {
     print_success "Container built successfully: $container_name"
 }
 
+setup_entitlements() {
+    local ent_dir="$1"
+
+    if [[ ! -d "$ent_dir" ]]; then
+        print_error "Entitlements directory not found: $ent_dir"
+        print_status "Generate entitlements with: ./hack/openshift/get-rhel-entitlements.sh"
+        exit 1
+    fi
+
+    # Find the certificate ID from the entitlements directory
+    local cert_file
+    cert_file=$(find "${ent_dir}" -maxdepth 1 -name '*.pem' ! -name '*-key.pem' -print -quit)
+    if [[ -z "$cert_file" ]]; then
+        print_error "No entitlement certificates found in $ent_dir"
+        exit 1
+    fi
+
+    local new_cert_id
+    new_cert_id=$(basename "$cert_file" .pem)
+    print_status "Using entitlement certificate ID: $new_cert_id"
+
+    # Find the existing cert ID in redhat.repo
+    if [[ ! -f "$redhat_repo_file" ]]; then
+        print_error "Repository file not found: $redhat_repo_file"
+        exit 1
+    fi
+
+    local old_cert_id
+    old_cert_id=$(grep -oP 'entitlement/\K[0-9]+' "$redhat_repo_file" | head -1)
+    if [[ -z "$old_cert_id" ]]; then
+        print_error "Could not find certificate ID in $redhat_repo_file"
+        exit 1
+    fi
+
+    if [[ "$old_cert_id" != "$new_cert_id" ]]; then
+        print_status "Updating $redhat_repo_file: cert ID $old_cert_id -> $new_cert_id"
+        cp "$redhat_repo_file" "${redhat_repo_file}.bak"
+        sed -i "s/$old_cert_id/$new_cert_id/g" "$redhat_repo_file"
+        repo_modified=true
+    fi
+}
+
+restore_repo_file() {
+    if [[ "${repo_modified:-false}" == "true" ]] && [[ -f "${redhat_repo_file}.bak" ]]; then
+        print_status "Restoring original $redhat_repo_file"
+        mv "${redhat_repo_file}.bak" "$redhat_repo_file"
+    fi
+}
+
 generate_lockfile() {
     local base_image="$1"
     local input_file="$2"
     local output_file="$3"
+    local ent_dir="${4:-}"
 
     print_status "Generating RPM lockfile..."
     print_status "Base image: $base_image"
     print_status "Input file: $input_file"
     print_status "Output file: $output_file"
+    if [[ -n "$ent_dir" ]]; then
+        print_status "Entitlements: $ent_dir"
+    fi
 
     if [[ -f "$output_file" ]]; then
         local backup_file
@@ -128,14 +197,30 @@ generate_lockfile() {
         print_warning "Backed up existing $output_file to $backup_file"
     fi
 
+    # Build podman command with optional entitlements mount
+    local podman_args=(
+        run --rm
+        -v "$(pwd):/work:Z"
+        -w /work
+    )
+
+    if [[ -n "$ent_dir" ]]; then
+        podman_args+=(-v "${ent_dir}:/etc/pki/entitlement:Z")
+        # Also mount RHSM CA certificates if available
+        if [[ -d "${ent_dir}/rhsm-ca" ]]; then
+            podman_args+=(-v "${ent_dir}/rhsm-ca:/etc/rhsm/ca:Z")
+        fi
+    fi
+
+    podman_args+=(
+        "$container_name"
+        --image "$base_image"
+        --outfile "$output_file"
+        "$input_file"
+    )
+
     print_status "Running rpm-lockfile-prototype..."
-    if ! podman run --rm \
-         -v "$(pwd):/work:Z" \
-         -w /work \
-         "$container_name" \
-         --image "$base_image" \
-         --outfile "$output_file" \
-         "$input_file"; then
+    if ! podman "${podman_args[@]}"; then
         print_error "Failed to generate lockfile"
         exit 1
     fi
@@ -181,7 +266,9 @@ validate_lockfile() {
 base_image="$default_base_image"
 input_file="$rpms_in_file"
 output_file="$rpms_lock_file"
+entitlements_dir=""
 rebuild_container=false
+repo_modified=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -195,6 +282,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -b|--base-image)
             base_image="$2"
+            shift 2
+            ;;
+        -e|--entitlements-dir)
+            entitlements_dir="$2"
             shift 2
             ;;
         --rebuild-container)
@@ -220,11 +311,21 @@ print_status "Working directory: $(pwd)"
 temp_dir=$(mktemp -d)
 
 # Set up cleanup trap
-trap 'rm -rf "$temp_dir"' EXIT
+cleanup() {
+    rm -rf "$temp_dir"
+    restore_repo_file
+}
+trap cleanup EXIT
 
 check_requirements
+
+# Set up entitlements if provided
+if [[ -n "$entitlements_dir" ]]; then
+    setup_entitlements "$entitlements_dir"
+fi
+
 build_container "$rebuild_container" "$temp_dir"
-generate_lockfile "$base_image" "$input_file" "$output_file"
+generate_lockfile "$base_image" "$input_file" "$output_file" "$entitlements_dir"
 validate_lockfile "$output_file"
 
 print_success "RPM lockfile generation completed!"
