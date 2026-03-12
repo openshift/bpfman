@@ -35,6 +35,15 @@ spec:
     value: '[{"type": "rpm", "path": "."}, {"type": "cargo", "path": "."}]'
   pipelineRef:
     name: build-pipeline
+  taskRunSpecs:
+    - pipelineTaskName: sast-snyk-check
+      stepSpecs:
+        - name: use-trusted-artifact
+          computeResources:
+            requests:
+              memory: 2Gi
+            limits:
+              memory: 2Gi
   taskRunTemplate:
     serviceAccountName: build-pipeline-bpfman-daemon-ystream
   workspaces:
