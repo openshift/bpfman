@@ -22,6 +22,7 @@ RUN : "${BUILD_COMMIT:=$(git rev-parse --short=10 HEAD 2>/dev/null || echo unkno
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 
 ARG BUILDVERSION
+ARG CPE_VERSION
 
 COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman .
 COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman-ns .
@@ -35,6 +36,7 @@ LABEL name="bpfman/bpfman" \
       io.k8s.description="Bpfman operates as an eBPF programs manager, focusing on simplifying the deployment and administration of eBPF programs." \
       io.openshift.tags="bpfman" \
       version=$BUILDVERSION \
+      cpe="cpe:/a:redhat:openshift_bpfman_operator:${CPE_VERSION}::el9" \
       vendor="Red Hat, Inc."
 
 ENTRYPOINT ["./bpfman-rpc", "--timeout=0"]
