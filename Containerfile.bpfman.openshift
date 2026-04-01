@@ -2,6 +2,7 @@ ARG BUILDVERSION
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest AS bpfman-build
 ARG BUILDVERSION
+ARG BUILD_COMMIT
 
 WORKDIR /usr/src/bpfman
 COPY ./ /usr/src/bpfman
@@ -12,7 +13,11 @@ RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
 
 # Compile bpfman cli, bpfman-ns, and bpfman-rpc binaries
 RUN mkdir -p bin/
-RUN cargo build --release
+RUN : "${BUILD_COMMIT:=$(git rev-parse --short=10 HEAD 2>/dev/null || echo unknown)}" && \
+    BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" && \
+    RUSTC_VERSION="$(rustc --version)" && \
+    export BPFMAN_BUILD_INFO="${BUILDVERSION} (${BUILD_COMMIT} ${BUILD_DATE}) ${RUSTC_VERSION}" && \
+    cargo build --release
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 

@@ -70,6 +70,7 @@ jobs:
             protobuf-compiler \
             cmake \
             perl \
+            libbpf-dev \
             libssl-dev \
             gcc-multilib \
             libelf-dev \
@@ -449,6 +450,11 @@ jobs:
       - name: Checkout bpfman
         uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -qy clang llvm libbpf-dev gcc-multilib libelf-dev
+
       - name: Set env
         run: |
           echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
@@ -464,6 +470,18 @@ jobs:
           pattern: bpfman-release-*
           merge-multiple: true
 
+      - name: publish bpfman crate
+        run: cargo publish -p bpfman --token ${{ secrets.BPFMAN_DEV_TOKEN }}
+
+      - name: publish bpfman-api crate
+        run: cargo publish -p bpfman-api --token ${{ secrets.BPFMAN_DEV_TOKEN }}
+
+      - name: publish bpf-log-exporter crate
+        run: cargo publish -p bpf-log-exporter --token ${{ secrets.BPFMAN_DEV_TOKEN }}
+
+      - name: publish bpf-metrics-exporter crate
+        run: cargo publish -p bpf-metrics-exporter --token ${{ secrets.BPFMAN_DEV_TOKEN }}
+
       - name: release
         # Revert softprops/action-gh-release from v2.2.0 to v2.1.0 due to
         # "Error: Request body length does not match content-length header"
@@ -477,18 +495,6 @@ jobs:
             bpfman-linux-arm64.tar.gz
             bpfman-linux-ppc64le.tar.gz
             bpfman-linux-s390x.tar.gz
-
-      - name: publish bpfman crate
-        run: cargo publish -p bpfman --token ${{ secrets.BPFMAN_DEV_TOKEN }}
-
-      - name: publish bpfman-api crate
-        run: cargo publish -p bpfman-api --token ${{ secrets.BPFMAN_DEV_TOKEN }}
-
-      - name: publish bpf-log-exporter crate
-        run: cargo publish -p bpf-log-exporter --token ${{ secrets.BPFMAN_DEV_TOKEN }}
-
-      - name: publish bpf-metrics-exporter crate
-        run: cargo publish -p bpf-metrics-exporter --token ${{ secrets.BPFMAN_DEV_TOKEN }}
 
   build-workflow-complete:
     needs:
