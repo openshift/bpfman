@@ -9,7 +9,7 @@ metadata:
     pipelinesascode.tekton.dev/cancel-in-progress: "false"
     pipelinesascode.tekton.dev/max-keep-runs: "3"
     pipelinesascode.tekton.dev/on-cel-expression: event == "push" && target_branch
-      == "release-0.5.8"
+      == "release-0.6"
   creationTimestamp: null
   labels:
     appstudio.openshift.io/application: bpfman-zstream
@@ -33,7 +33,9 @@ spec:
     value:
     - BUILD_COMMIT={{revision}}
   - name: hermetic
-    value: 'false'
+    value: 'true'
+  - name: prefetch-input
+    value: '[{"type": "rpm", "path": "."}, {"type": "cargo", "path": "."}]'
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
