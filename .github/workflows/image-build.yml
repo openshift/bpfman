@@ -724,7 +724,7 @@ jobs:
         if: ${{ matrix.image.build_language == 'go' }}
         with:
           # prettier-ignore
-          go-version: '1.22' # yamllint disable-line rule:quoted-strings
+          go-version: '1.26' # yamllint disable-line rule:quoted-strings
 
       - name: Install cosign
         uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb # @v3.8.2
