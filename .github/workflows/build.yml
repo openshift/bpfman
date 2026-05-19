@@ -486,7 +486,7 @@ jobs:
         # Revert softprops/action-gh-release from v2.2.0 to v2.1.0 due to
         # "Error: Request body length does not match content-length header"
         # https://github.com/softprops/action-gh-release/issues/556
-        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # @v2
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           body_path: ./changelogs/CHANGELOG-${{ env.RELEASE_VERSION }}.md
           prerelease: ${{ env.PRE_RELEASE }}
