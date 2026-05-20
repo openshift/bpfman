@@ -116,12 +116,12 @@ jobs:
       - name: Install cargo-llvm-cov
         # Only need to run once
         if: ${{ matrix.arch.arch == 'amd64' }}
-        uses: taiki-e/install-action@ac87e9813a4968fd0c941361295f6d119b826393 # @cargo-llvm-cov
+        uses: taiki-e/install-action@c5d8b559947d2f1d819c178943e3fb75c8e050e1 # @cargo-llvm-cov
 
       - name: Install toml linter
         # Only need to run once
         if: ${{ matrix.arch.arch == 'amd64' }}
-        uses: taiki-e/install-action@e29814c376696105d80cec9e9efaa98bae8e7347 # @v2
+        uses: taiki-e/install-action@213ccc1a076163c093f914550b94feb90fab916d # v2
         with:
           tool: taplo-cli
 
