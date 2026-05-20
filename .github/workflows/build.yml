@@ -297,7 +297,7 @@ jobs:
         uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # @v5
         with:
           # prettier-ignore
-          go-version: '1.22' # yamllint disable-line rule:quoted-strings
+          go-version: '1.26' # yamllint disable-line rule:quoted-strings
 
       - name: Go mod check
         # Only need to run go mod once, so just pick one of the arch to run on.
