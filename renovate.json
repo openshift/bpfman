@@ -4,5 +4,8 @@
   },
   "cargo": {
     "enabled": false
+  },
+  "github-actions": {
+    "enabled": false
   }
 }
