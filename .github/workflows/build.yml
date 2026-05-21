@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 3
 
     steps:
-      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
       - name: Check License Header
         uses: apache/skywalking-eyes@5c5b974209f0de5d905f37deb69369068ebfc15c
 
@@ -76,12 +76,12 @@ jobs:
             libelf-dev \
 
       - name: Checkout bpfman
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Checkout libbpf
         # libbpf only needed to build eBPF and used by integration-tests, only on amd64
         if: ${{ matrix.arch.arch == 'amd64' }}
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: libbpf/libbpf
           path: libbpf
@@ -291,7 +291,7 @@ jobs:
     name: Build Go Modules (${{ matrix.arch.arch }})
     steps:
       - name: Checkout bpfman
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install go
         uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # @v5
@@ -348,7 +348,7 @@ jobs:
           driver-opts: network=host
 
       - name: Checkout bpfman
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Download bpfman x86_64 build
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # @v4
@@ -414,7 +414,7 @@ jobs:
             libxslt-dev \
 
       - name: Checkout bpfman
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install required-version defined in pyproject.toml
         uses: astral-sh/setup-uv@v6
@@ -448,7 +448,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout bpfman
-        uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Install dependencies
         run: |
