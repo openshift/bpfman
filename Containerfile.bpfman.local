@@ -5,7 +5,7 @@
 # This is a short term fix and will be moving to ubi9minimal as soon as possible. So try to keep
 # keep Ubuntu specifics on their own lines.
 #FROM rust:1 AS bpfman-build
-FROM ubuntu:24.04 AS bpfman-build
+FROM ubuntu:26.04 AS bpfman-build
 
 # Packages need to build on Ubuntu
 RUN apt-get update && apt-get install -y\
@@ -47,7 +47,7 @@ RUN --mount=type=cache,target=/usr/src/bpfman/target/ \
     cp /usr/src/bpfman/target/release/bpfman-rpc ./bpfman/
 
 #FROM fedora:40
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 ## Image for Local testing is much more of a debug image, give it bpftool and tcpdump
 # RUN dnf makecache --refresh && dnf -y install bpftool tcpdump
