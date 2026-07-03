@@ -4,12 +4,14 @@ reviewers:
   - billy99
   - dave-tucker
   - frobware
+  - alebedev87
 approvers:
   - anfredette
   - billy99
   - dave-tucker
   - frobware
   - mffiedler
+  - alebedev87
 
 # Bugzilla info
 component: "Networking"
