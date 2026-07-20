@@ -1,10 +1,10 @@
 packages:
+  - make
+  - git
+  - golang
   - gcc
-  - openssl-devel
-  - cmake
-  - clang-devel
-  - rust
-  - cargo
+  - clang
+  - llvm
   - libbpf-devel
 contentOrigin:
   repofiles:

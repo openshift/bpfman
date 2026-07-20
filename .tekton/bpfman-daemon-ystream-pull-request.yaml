@@ -37,7 +37,7 @@ spec:
   - name: hermetic
     value: 'true'
   - name: prefetch-input
-    value: '[{"type": "rpm", "path": "."}, {"type": "cargo", "path": "."}]'
+    value: '[{"type": "rpm", "path": "."}, {"type": "gomod", "path": "."}]'
   pipelineRef:
     name: build-pipeline
   taskRunTemplate:
