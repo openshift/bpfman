@@ -9,24 +9,26 @@ COPY ./ /usr/src/bpfman
 
 # Install build dependencies using pre-fetched RPM packages for hermetic builds
 RUN microdnf install -y --nodocs --setopt=keepcache=0 --setopt=tsflags=nodocs \
-    gcc openssl-devel cmake clang-devel rust cargo libbpf-devel && microdnf clean all
+    make git \
+    golang \
+    gcc \
+    clang llvm \
+    libbpf-devel \
+    && microdnf clean all
 
-# Compile bpfman cli, bpfman-ns, and bpfman-rpc binaries
-RUN mkdir -p bin/
-RUN : "${BUILD_COMMIT:=$(git rev-parse --short=10 HEAD 2>/dev/null || echo unknown)}" && \
-    BUILD_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)" && \
-    RUSTC_VERSION="$(rustc --version)" && \
-    export BPFMAN_BUILD_INFO="${BUILDVERSION} (${BUILD_COMMIT} ${BUILD_DATE}) ${RUSTC_VERSION}" && \
-    cargo build --release
+RUN BUILD_COMMIT="${BUILD_COMMIT:-$(git rev-parse --short=10 HEAD 2>/dev/null || echo unknown)}" && \
+    GOTOOLCHAIN=local \
+    GOFLAGS="-mod=vendor" \
+    make bpfman-compile \
+        GIT_COMMIT="${BUILD_COMMIT}" \
+        GIT_VERSION="${BUILDVERSION}"
 
 FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:062c52ff973065752b0965787649db2bcf551a6c727a00e95a3eb42cebadbdab
 
 ARG BUILDVERSION
 ARG CPE_VERSION
 
-COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman .
-COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman-ns .
-COPY --from=bpfman-build  /usr/src/bpfman/target/release/bpfman-rpc .
+COPY --from=bpfman-build /usr/src/bpfman/bin/bpfman /bpfman
 
 LABEL name="bpfman/bpfman" \
       com.redhat.component="bpfman" \
@@ -39,4 +41,4 @@ LABEL name="bpfman/bpfman" \
       cpe="cpe:/a:redhat:openshift_bpfman_operator:${CPE_VERSION}::el9" \
       vendor="Red Hat, Inc."
 
-ENTRYPOINT ["./bpfman-rpc", "--timeout=0"]
+ENTRYPOINT ["/bpfman"]

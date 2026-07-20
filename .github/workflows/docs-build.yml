@@ -18,15 +18,14 @@ jobs:
             libxml2-dev \
             libxslt-dev \
 
-      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # @v4
         with:
           ref: gh-pages
-      - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # @v4
-      - uses: astral-sh/setup-uv@v6
-      - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b # @v5
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # @v4
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # @v5
         with:
-          # prettier-ignore
-          go-version: '1.21' # yamllint disable-line rule:quoted-strings
+          go-version-file: go.mod
 
       - name: Build API docs
         run: |
@@ -40,7 +39,7 @@ jobs:
       - name: Deploy Docs (Release Version)
         if: startsWith(github.ref_name, 'v')
         run: |
-          uv run mike deploy --push --update-aliases ${{ github.ref_name }} latest
+          uv run mike deploy --push --update-aliases --alias-type=redirect ${{ github.ref_name }} latest
 
       - name: Deploy Docs (Development Version)
         if: github.ref_name == 'main'
