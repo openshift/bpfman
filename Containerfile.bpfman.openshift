@@ -1,6 +1,6 @@
 ARG BUILDVERSION
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:062c52ff973065752b0965787649db2bcf551a6c727a00e95a3eb42cebadbdab AS bpfman-build
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93 AS bpfman-build
 ARG BUILDVERSION
 ARG BUILD_COMMIT
 
@@ -19,7 +19,7 @@ RUN : "${BUILD_COMMIT:=$(git rev-parse --short=10 HEAD 2>/dev/null || echo unkno
     export BPFMAN_BUILD_INFO="${BUILDVERSION} (${BUILD_COMMIT} ${BUILD_DATE}) ${RUSTC_VERSION}" && \
     cargo build --release
 
-FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:062c52ff973065752b0965787649db2bcf551a6c727a00e95a3eb42cebadbdab
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest@sha256:7fbeae18dc9476399f565e68255f602a3374ea8614ba3d14843565131a13ff93
 
 ARG BUILDVERSION
 ARG CPE_VERSION
